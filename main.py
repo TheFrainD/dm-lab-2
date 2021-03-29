@@ -1,8 +1,13 @@
 import tkinter as tk
 import pickle
+import random
 
 A = set()
 B = set()
+male_names = ['Андрій', 'Антон', 'Денис', 'Богдан', 'Віталій', 'Віктор', 'Костя', 'Сергій', 'Вова']
+female_names = ['Настя', 'Маша', 'Аня', 'Катя', 'Юля', 'Даша', 'Оля', 'Люда']
+first_relation = []
+second_relation = []
 
 
 def message_window(root, msg):
@@ -63,7 +68,7 @@ def main_window():
 
 
 def second_window(root):
-    global A, B
+    global A, B, male_names, female_names
 
     window = tk.Toplevel(root)
     window.title('Вікно №2')
@@ -140,8 +145,6 @@ def second_window(root):
                                value=1,
                                command=radio_select)
 
-    male_names = ['Андрій', 'Антон', 'Денис', 'Богдан', 'Віталій', 'Віктор', 'Костя', 'Сергій', 'Вова']
-
     lfr_male_names = tk.LabelFrame(window,
                                    text='Чоловічі імена')
 
@@ -150,8 +153,6 @@ def second_window(root):
     lbx_male_names.bind('<<ListboxSelect>>', lambda event: add_to_set(lbx_male_names, male_names, var.get()))
     lbx_male_names.pack()
     lbx_male_names.insert(tk.END, *male_names)
-
-    female_names = ['Настя', 'Маша', 'Аня', 'Катя', 'Юля', 'Даша', 'Оля', 'Люда']
 
     lfr_female_names = tk.LabelFrame(window,
                                      text='Жіночі імена')
@@ -185,7 +186,7 @@ def second_window(root):
     lfr_sets = tk.LabelFrame(window,
                              text='Множини')
     lbl_sets = tk.Label(lfr_sets,
-                        text='A = {}\nB = {}')
+                        text='A = {}\nB = {}'.format(A, B))
     lbl_sets.pack()
 
     rad_set_a.grid(row=0, column=0)
@@ -208,9 +209,80 @@ def second_window(root):
 
 
 def third_window(root):
+    global A, B, female_names, male_names, first_relation, second_relation
+
     window = tk.Toplevel(root)
     window.title('Вікно №3')
     window.focus_set()
+
+    def build_first_relation():
+        global A, B, female_names, male_names, first_relation, second_relation
+
+        a = []
+        b = []
+        for name in A:
+            if name in female_names:
+                a.append(name)
+        for name in B:
+            if name in male_names:
+                b.append(name)
+
+        first_relation = []
+        for i in range(random.randint(1, len(a) - 1)):
+            p = random.choice(list(a))
+            q = random.choice(list(b))
+
+            if p != q:
+                first_relation.append((p, q))
+
+            a.remove(p)
+            b.remove(q)
+        pass
+
+    def build_second_relation():
+        global A, B, female_names, male_names, first_relation, second_relation
+
+        a = []
+        b = []
+        for name in A:
+            if name in female_names:
+                a.append(name)
+        for name in B:
+            if name in male_names:
+                b.append(name)
+
+        second_relation = []
+        for i in range(random.randint(1, len(a) - 1)):
+            p = random.choice(list(a))
+            q = random.choice(list(b))
+
+            if p != q and (p, q) not in first_relation:
+                second_relation.append((p, q))
+
+            a.remove(p)
+            b.remove(q)
+        pass
+
+    lfr_set_a = tk.LabelFrame(window,
+                              text='A')
+    lbx_set_a = tk.Listbox(lfr_set_a,
+                           selectmode=tk.EXTENDED)
+    lbx_set_a.pack()
+    lbx_set_a.insert(tk.END, *A)
+
+    lfr_set_b = tk.LabelFrame(window,
+                              text='B')
+    lbx_set_b = tk.Listbox(lfr_set_b,
+                           selectmode=tk.EXTENDED)
+    lbx_set_b.pack()
+    lbx_set_b.insert(tk.END, *B)
+
+    lfr_set_a.grid(row=0, column=0, padx=15)
+    lfr_set_b.grid(row=0, column=1, padx=15)
+
+    build_first_relation()
+    build_second_relation()
+    print(first_relation, second_relation)
     pass
 
 
