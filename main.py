@@ -4,8 +4,8 @@ import random
 
 A = set()
 B = set()
-male_names = ['Андрій', 'Антон', 'Денис', 'Богдан', 'Віталій', 'Віктор', 'Костя', 'Сергій', 'Вова']
-female_names = ['Настя', 'Маша', 'Аня', 'Катя', 'Юля', 'Даша', 'Оля', 'Люда']
+male_names = ['Богдан', 'Віталій', 'Віктор', 'Костя', 'Андрій', 'Антон', 'Денис', 'Сергій', 'Вова']
+female_names = ['Маша', 'Аня', 'Оля', 'Елеонора', 'Люда', 'Катя', 'Юля', 'Даша', 'Настя', 'Аліна']
 first_relation = []
 second_relation = []
 
@@ -18,6 +18,27 @@ def message_window(root, msg):
     lbl_msg = tk.Label(window,
                        text=msg)
     lbl_msg.pack()
+    pass
+
+
+def draw_graph(canvas, A, B, R, text, direction=tk.LAST):
+    a_cords = {}
+    b_cords = {}
+
+    canvas.delete('all')
+    canvas.create_text(100, 30, text=text, font='Arial 14')
+
+    for i in range(len(A)):
+        canvas.create_text(30 + i * 50, 50, text=list(A)[i])
+        canvas.create_oval([20 + i * 50, 60], [40 + i * 50, 80], fill='green')
+        a_cords.update({list(A)[i]: [30 + i * 50, 80]})
+
+    for i in range(len(B)):
+        canvas.create_text(30 + i * 50, 190, text=list(B)[i])
+        canvas.create_oval([20 + i * 50, 160], [40 + i * 50, 180], fill='blue')
+        b_cords.update({list(B)[i]: [30 + i * 50, 160]})
+    for i in R:
+        canvas.create_line(a_cords[i[0]], b_cords[i[1]], arrow=direction)
     pass
 
 
@@ -277,19 +298,94 @@ def third_window(root):
     lbx_set_b.pack()
     lbx_set_b.insert(tk.END, *B)
 
-    lfr_set_a.grid(row=0, column=0, padx=15)
-    lfr_set_b.grid(row=0, column=1, padx=15)
-
     build_first_relation()
     build_second_relation()
-    print(first_relation, second_relation)
+
+    can_graph_s = tk.Canvas(window,
+                            width=620,
+                            height=240)
+    draw_graph(can_graph_s, A, B, first_relation, 'a теща b')
+
+    can_graph_r = tk.Canvas(window,
+                            width=620,
+                            height=240)
+    draw_graph(can_graph_r, A, B, second_relation, 'a дружина b')
+
+    lfr_set_a.grid(row=0, column=0, padx=7)
+    lfr_set_b.grid(row=0, column=1, padx=7)
+    can_graph_s.grid(row=1, columnspan=2)
+    can_graph_r.grid(row=2, columnspan=2)
     pass
 
 
 def forth_window(root):
+    global A, B, first_relation, second_relation, male_names, female_names
+
     window = tk.Toplevel(root)
     window.title('Вікно №4')
     window.focus_set()
+
+    def union():
+        set_result = list(set(second_relation).union(set(first_relation)))
+        draw_graph(can_result, A, B, set_result, 'R ∪ S')
+        pass
+
+    def intersection():
+        set_result = list(set(second_relation).intersection(set(first_relation)))
+        draw_graph(can_result, A, B, set_result, 'R ∩ S')
+        pass
+
+    def difference():
+        set_result = list(set(second_relation).difference(set(first_relation)))
+        draw_graph(can_result, A, B, set_result, 'R \\ S')
+        pass
+
+    def extension():
+        global A, B
+        U = []
+        for r in A:
+            for s in B:
+                if (r, s) not in second_relation:
+                    U.append((r, s))
+        U = list(set(U))
+        draw_graph(can_result, A, B, U, 'U \\ R')
+        pass
+
+    def reverse():
+        draw_graph(can_result, A, B, first_relation, 'S⁻¹', tk.FIRST)
+        pass
+
+    btn_union = tk.Button(window,
+                          text='R ∪ S',
+                          command=union)
+    btn_intersection = tk.Button(window,
+                                 text='R ∩ S',
+                                 command=intersection)
+    btn_difference = tk.Button(window,
+                               text='R \\ S',
+                               command=difference)
+    btn_extension = tk.Button(window,
+                              text='U \\ R',
+                              command=extension)
+    btn_reversed = tk.Button(window,
+                             text='S⁻¹',
+                             command=reverse)
+
+    lbl_title = tk.Label(window,
+                         text='Результати операцій над множинами')
+
+    can_result = tk.Canvas(window,
+                           width=620,
+                           height=240)
+
+    btn_union.grid(row=1, column=0)
+    btn_intersection.grid(row=2, column=0)
+    btn_difference.grid(row=3, column=0)
+    btn_extension.grid(row=4, column=0)
+    btn_reversed.grid(row=5, column=0)
+
+    lbl_title.grid(row=0, column=1)
+    can_result.grid(row=1, column=1, rowspan=5)
     pass
 
 
